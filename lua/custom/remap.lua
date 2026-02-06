@@ -56,6 +56,14 @@ keymap.set('v', '<D-v>', '"+p', { desc = "Paste from system clipboard (Cmd+V)" }
 keymap.set('i', '<D-v>', '<C-r>+', { desc = "Paste from system clipboard in insert mode (Cmd+V)" })
 keymap.set('c', '<D-v>', '<C-r>+', { desc = "Paste from system clipboard in command mode (Cmd+V)" })
 
+-- Commenting (macOS-style Cmd+/)
+keymap.set('n', '<D-/>', 'gcc', { remap = true, desc = "Comment line (Cmd+/)" })
+keymap.set('v', '<D-/>', 'gc', { remap = true, desc = "Comment selection (Cmd+/)" })
+keymap.set('n', '<C-_>', 'gcc', { remap = true, desc = "Comment line (fallback for Cmd+/)" })
+keymap.set('v', '<C-_>', 'gc', { remap = true, desc = "Comment selection (fallback for Cmd+/)" })
+keymap.set('n', '<C-/>', 'gcc', { remap = true, desc = "Comment line (fallback for Cmd+/)" })
+keymap.set('v', '<C-/>', 'gc', { remap = true, desc = "Comment selection (fallback for Cmd+/)" })
+
 -- Quick command
 keymap.set('n', '<leader>;', ':', { desc = "Command mode" })
 
