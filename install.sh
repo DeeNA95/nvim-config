@@ -81,9 +81,57 @@ install_nvim() {
     echo "✅ Neovim $NVIM_VERSION installed successfully."
 }
 
+# Function to check LuaRocks version
+check_luarocks_version() {
+    if command -v luarocks >/dev/null 2>&1; then
+        LUAROCKS_INFO=$(luarocks --version 2>&1)
+        if echo "$LUAROCKS_INFO" | grep -q "Lua 5.1"; then
+            echo "✅ LuaRocks targeting Lua 5.1 already installed."
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Function to install LuaRocks 5.1
+install_luarocks() {
+    OS="$(uname -s)"
+    echo "📦 Installing LuaRocks targeting Lua 5.1 for $OS..."
+
+    case "$OS" in
+        Darwin)
+            if command -v brew >/dev/null 2>&1; then
+                echo "🍺 Using Homebrew to install LuaRocks..."
+                brew install luarocks
+            else
+                echo "❌ Error: Homebrew not found. Please install Homebrew or install LuaRocks 5.1 manually."
+                exit 1
+            fi
+            ;;
+        Linux)
+            echo "🐧 Installing LuaRocks and Lua 5.1 via package manager..."
+            if command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update && sudo apt-get install -y luarocks lua5.1 liblua5.1-0-dev
+            elif command -v dnf >/dev/null 2>&1; then
+                sudo dnf install -y luarocks lua-devel
+            elif command -v yum >/dev/null 2>&1; then
+                sudo yum install -y luarocks
+            else
+                echo "❌ Error: Unsupported Linux package manager. Please install LuaRocks 5.1 manually."
+                exit 1
+            fi
+            ;;
+    esac
+}
+
 # 2. Install Neovim if needed
 if ! check_nvim_version; then
     install_nvim
+fi
+
+# 2b. Install LuaRocks 5.1 if needed
+if ! check_luarocks_version; then
+    install_luarocks
 fi
 
 # 3. Setup configuration directory
