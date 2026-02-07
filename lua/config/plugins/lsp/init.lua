@@ -24,10 +24,9 @@ return {
         config = function()
           require("mason-lspconfig").setup({
             ensure_installed = {
-              "pyright",          -- Python
-              "r_language_server", -- R
-              "clangd",           -- C/C++
-              "gopls",            -- Go
+              "pyright",  -- Python
+              "clangd",   -- C/C++
+              "gopls",    -- Go
             },
             automatic_installation = true,
           })
@@ -94,17 +93,9 @@ return {
       })
       vim.lsp.enable('pyright')
 
-      -- R setup
-      vim.lsp.config('r_language_server', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-      vim.lsp.enable('r_language_server')
-
       -- C/C++ setup
       vim.lsp.config('clangd', {
         on_attach = function(client, bufnr)
-          -- Optionally disable formatting if using clang-format separately
           client.server_capabilities.documentFormattingProvider = false
           on_attach(client, bufnr)
         end,
@@ -151,9 +142,6 @@ return {
 
           -- C/C++
           null_ls.builtins.formatting.clang_format,
-
-          -- R
-          null_ls.builtins.formatting.styler,
 
           -- Go
           null_ls.builtins.formatting.goimports,

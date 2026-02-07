@@ -1,5 +1,18 @@
--- In lua/config/plugins/git.lua
+-- Git integration and utilities
 return {
+  -- Git command integration (essential for remote work)
+  {
+    "tpope/vim-fugitive",
+    cmd = { "Git", "GBrowse" },
+    keys = {
+      { "<leader>gg", "<cmd>Git<cr>", desc = "Git status" },
+      { "<leader>gc", "<cmd>Git commit<cr>", desc = "Git commit" },
+      { "<leader>gp", "<cmd>Git push<cr>", desc = "Git push" },
+      { "<leader>gP", "<cmd>Git pull<cr>", desc = "Git pull" },
+    },
+  },
+
+  -- Git signs in line numbers
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },

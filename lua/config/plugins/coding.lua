@@ -19,7 +19,7 @@ return {
         follow_current_file = { enabled = true },
         use_libuv_file_watcher = true,
         filtered_items = {
-          hide_gitignored = false, -- show files ignored by git
+          hide_gitignored = false,
         },
       },
       window = {
@@ -40,26 +40,6 @@ return {
     end,
   },
 
-  -- Auto pairs
-  {
-    "windwp/nvim-autopairs",
-    event = "InsertEnter",
-    config = function()
-      require("nvim-autopairs").setup({
-        check_ts = true,
-        ts_config = {
-          lua = { "string" },
-          javascript = { "template_string" },
-        },
-      })
-
-      -- Integration with nvim-cmp
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-      local cmp = require("cmp")
-      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-    end,
-  },
-
   -- Better comments
   {
     "numToStr/Comment.nvim",
@@ -74,7 +54,7 @@ return {
     end,
   },
 
-  -- Markdown preview in a floating window (requires the `glow` binary)
+  -- Markdown preview
   {
     "ellisonleao/glow.nvim",
     cmd = "Glow",
@@ -113,22 +93,6 @@ return {
     },
   },
 
-  -- Trouble for diagnostics
-  {
-    "folke/trouble.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    keys = {
-      { "<leader>xx", "<cmd>TroubleToggle<cr>", desc = "Toggle Trouble" },
-      { "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics" },
-      { "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", desc = "Document Diagnostics" },
-      { "<leader>xl", "<cmd>TroubleToggle loclist<cr>", desc = "Location List" },
-      { "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", desc = "Quickfix" },
-    },
-    opts = {
-      use_diagnostic_signs = true,
-    },
-  },
-
   -- Flash for better f/F/t/T motions
   {
     "folke/flash.nvim",
@@ -141,14 +105,14 @@ return {
       { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
     },
   },
+
   -- Aerial for code outline
   {
     "stevearc/aerial.nvim",
     opts = {},
-    -- Optional dependencies
     dependencies = {
-       "nvim-treesitter/nvim-treesitter",
-       "nvim-tree/nvim-web-devicons"
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons"
     },
     keys = {
       { "<leader>a", "<cmd>AerialToggle!<cr>", desc = "Toggle Aerial" },
