@@ -12,9 +12,9 @@ return {
         ensure_installed = {
           "lua", "vim", "vimdoc", "bash", "fish",
           "javascript", "typescript", "tsx", "json", "yaml", "toml",
-          "python", "r", "cpp", "c", "rust", "go",
+          "python", "r", "cpp", "c", "cuda", "rust", "go",
           "html", "css", "scss", "markdown", "markdown_inline",
-          "regex", "dockerfile", "gitignore", "query"
+          "regex", "dockerfile", "gitignore", "query", "cmake"
         },
         sync_install = false,
         auto_install = true,
@@ -74,7 +74,7 @@ return {
       })
     end,
   },
-  
+
   -- Context-aware commenting
   {
     "JoosepAlviste/nvim-ts-context-commentstring",

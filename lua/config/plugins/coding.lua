@@ -73,7 +73,7 @@ return {
     event = "VeryLazy",
     init = function()
       vim.o.timeout = true
-      vim.o.timeoutlen = 300
+      -- timeoutlen set in config/options.lua
     end,
     opts = {
       win = {
@@ -89,6 +89,8 @@ return {
         { "<leader>b", group = "buffer" },
         { "<leader>d", group = "debug" },
         { "<leader>x", group = "diagnostics" },
+        { "<leader>S", group = "session" },
+        { "<leader>m", group = "molten/markdown" },
       },
     },
   },
@@ -116,6 +118,33 @@ return {
     },
     keys = {
       { "<leader>a", "<cmd>AerialToggle!<cr>", desc = "Toggle Aerial" },
+    },
+  },
+
+  -- TODO/FIXME/HACK highlights
+  {
+    "folke/todo-comments.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    keys = {
+      { "]t", function() require("todo-comments").jump_next() end, desc = "Next TODO" },
+      { "[t", function() require("todo-comments").jump_prev() end, desc = "Prev TODO" },
+      { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
+      { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "TODOs (Trouble)" },
+    },
+  },
+
+  -- Session management (auto-save/restore per project)
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    opts = {},
+    keys = {
+      { "<leader>Sr", function() require("persistence").load() end, desc = "Restore Session" },
+      { "<leader>Ss", function() require("persistence").select() end, desc = "Select Session" },
+      { "<leader>Sl", function() require("persistence").load({ last = true }) end, desc = "Restore Last Session" },
+      { "<leader>Sd", function() require("persistence").stop() end, desc = "Stop Persistence" },
     },
   },
 }

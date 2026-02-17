@@ -2,7 +2,7 @@
 local function setup_autocmds()
   local autocmd = vim.api.nvim_create_autocmd
   local augroup = vim.api.nvim_create_augroup
-  
+
   -- Python specific settings
   local python_group = augroup("PythonSettings", { clear = true })
   autocmd("FileType", {
@@ -15,7 +15,7 @@ local function setup_autocmds()
       vim.opt_local.colorcolumn = "88"  -- Black's default line length
     end,
   })
-  
+
   -- C++ specific settings
   local cpp_group = augroup("CppSettings", { clear = true })
   autocmd("FileType", {
@@ -28,7 +28,7 @@ local function setup_autocmds()
       vim.opt_local.colorcolumn = "80"
     end,
   })
-  
+
   -- R specific settings
   local r_group = augroup("RSettings", { clear = true })
   autocmd("FileType", {
@@ -40,7 +40,7 @@ local function setup_autocmds()
       vim.opt_local.expandtab = true
     end,
   })
-  
+
   -- Go specific settings
   local go_group = augroup("GoSettings", { clear = true })
   autocmd("FileType", {
@@ -52,7 +52,7 @@ local function setup_autocmds()
       vim.opt_local.softtabstop = 4
       vim.opt_local.expandtab = false  -- Go uses tabs
       vim.opt_local.colorcolumn = "120"
-      
+
       -- Go-specific key mappings
       local opts = { noremap = true, silent = true, buffer = true }
       vim.keymap.set('n', '<leader>gr', ':GoRun<CR>', vim.tbl_extend('force', opts, { desc = 'Go Run' }))
@@ -62,29 +62,73 @@ local function setup_autocmds()
       vim.keymap.set('n', '<leader>gi', ':GoImports<CR>', vim.tbl_extend('force', opts, { desc = 'Go Imports' }))
     end,
   })
-  
-  -- Auto-format and organize imports on save for Go files
-  autocmd("BufWritePre", {
-    group = go_group,
-    pattern = "*.go",
+  -- Lua specific settings
+  local lua_group = augroup("LuaSettings", { clear = true })
+  autocmd("FileType", {
+    group = lua_group,
+    pattern = "lua",
     callback = function()
-      -- Organize imports
-      local params = vim.lsp.util.make_range_params()
-      params.context = { only = { "source.organizeImports" } }
-      local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-      for _, res in pairs(result or {}) do
-        for _, r in pairs(res.result or {}) do
-          if r.edit then
-            vim.lsp.util.apply_workspace_edit(r.edit, "utf-8")
-          end
-        end
-      end
-      
-      -- Format the file
-      vim.lsp.buf.format({ timeout_ms = 3000 })
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.tabstop = 2
+      vim.opt_local.expandtab = true
+      vim.opt_local.colorcolumn = "120"
     end,
   })
+
+  -- Shell/Bash specific settings
+  local shell_group = augroup("ShellSettings", { clear = true })
+  autocmd("FileType", {
+    group = shell_group,
+    pattern = { "sh", "bash", "zsh" },
+    callback = function()
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.tabstop = 2
+      vim.opt_local.expandtab = true
+      vim.opt_local.colorcolumn = "80"
+    end,
+  })
+
+  -- YAML specific settings
+  local yaml_group = augroup("YamlSettings", { clear = true })
+  autocmd("FileType", {
+    group = yaml_group,
+    pattern = "yaml",
+    callback = function()
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.tabstop = 2
+      vim.opt_local.expandtab = true
+    end,
+  })
+
+  -- TOML specific settings
+  local toml_group = augroup("TomlSettings", { clear = true })
+  autocmd("FileType", {
+    group = toml_group,
+    pattern = "toml",
+    callback = function()
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.tabstop = 2
+      vim.opt_local.expandtab = true
+    end,
+  })
+
+  -- Markdown specific settings
+  local md_group = augroup("MarkdownSettings", { clear = true })
+  autocmd("FileType", {
+    group = md_group,
+    pattern = "markdown",
+    callback = function()
+      vim.opt_local.wrap = true
+      vim.opt_local.linebreak = true
+      vim.opt_local.spell = true
+      vim.opt_local.conceallevel = 2
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.tabstop = 2
+      vim.opt_local.expandtab = true
+    end,
+  })
+
+  -- Go format-on-save handled by conform.nvim (see plugins/formatting.lua)
 end
 
 return { setup = setup_autocmds }
-

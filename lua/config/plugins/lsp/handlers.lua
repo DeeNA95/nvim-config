@@ -35,8 +35,8 @@ M.on_attach = function(client, bufnr)
   -- Diagnostic navigation
   vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
   vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-  vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
-  vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+  vim.keymap.set('n', '<leader>E', vim.diagnostic.open_float, opts)
+  vim.keymap.set('n', '<leader>Q', vim.diagnostic.setloclist, opts)
 
   -- Add border to hover and signature help
   if client.server_capabilities.hoverProvider then

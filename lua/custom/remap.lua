@@ -1,5 +1,4 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = ","
+-- Leader keys set in init.lua
 
 local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
@@ -39,7 +38,7 @@ keymap.set('n', 'J', 'mzJ`z', { desc = "Join lines and keep cursor position" })
 -- Better search
 keymap.set('n', 'n', 'nzzzv', { desc = "Next search result (centered)" })
 keymap.set('n', 'N', 'Nzzzv', { desc = "Previous search result (centered)" })
-keymap.set('n', '<leader>/', ':nohlsearch<CR>', { desc = "Clear search highlights" })
+-- <leader>/ is mapped to buffer fuzzy find by Telescope
 
 -- Clipboard
 keymap.set('n', '<leader>y', '"+y', { desc = "Copy to system clipboard" })

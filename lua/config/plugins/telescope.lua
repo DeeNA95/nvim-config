@@ -4,6 +4,7 @@ return {
     "nvim-lua/plenary.nvim", -- Required dependency for Telescope
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" }, -- Necessary for fzf-native
   },
+  cmd = "Telescope",
   keys = { -- Enhanced keymaps
     { "<leader>ff", function() require("telescope.builtin").find_files() end, desc = "Find files" },
     { "<leader>fF", function() require("telescope.builtin").find_files({ no_ignore = true, hidden = true }) end, desc = "Find all files" },

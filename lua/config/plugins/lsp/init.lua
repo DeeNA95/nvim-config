@@ -37,6 +37,11 @@ return {
               "taplo",    -- TOML
             },
             automatic_installation = true,
+            -- Noop handler: prevents auto-starting servers
+            -- (we configure them manually via vim.lsp.config/enable below)
+            handlers = {
+              function(server_name) end,
+            },
           })
         end
       },
