@@ -4,6 +4,7 @@ return {
     dependencies = {
       "rcarriga/nvim-dap-ui",
       "mfussenegger/nvim-dap-python",
+      "leoluz/nvim-dap-go",
       "nvim-neotest/nvim-nio",
       "theHamsta/nvim-dap-virtual-text",
     },
@@ -31,6 +32,73 @@ return {
       -- Python configuration
       require("dap-python").setup("/usr/bin/python3") -- Path to python
       require("dap-python").test_runner = "pytest"
+
+      -- Go configuration (via nvim-dap-go + delve)
+      require("dap-go").setup()
+
+      -- C/C++/CUDA configuration (via codelldb)
+      -- Install with :MasonInstall codelldb
+      local mason_path = vim.fn.stdpath("data") .. "/mason"
+      local codelldb_path = mason_path .. "/bin/codelldb"
+
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = codelldb_path,
+          args = { "--port", "${port}" },
+        },
+      }
+
+      -- Shared launch config for C, C++, and CUDA
+      local codelldb_config = {
+        {
+          name = "Launch executable",
+          type = "codelldb",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+        },
+        {
+          name = "Attach to process",
+          type = "codelldb",
+          request = "attach",
+          pid = require("dap.utils").pick_process,
+          cwd = "${workspaceFolder}",
+        },
+      }
+
+      dap.configurations.c = codelldb_config
+      dap.configurations.cpp = codelldb_config
+      dap.configurations.cuda = codelldb_config
+
+      -- Bash configuration (via bash-debug-adapter)
+      dap.adapters.bashdb = {
+        type = "executable",
+        command = mason_path .. "/bin/bash-debug-adapter",
+        name = "bashdb",
+      }
+
+      dap.configurations.sh = {
+        {
+          name = "Launch Bash script",
+          type = "bashdb",
+          request = "launch",
+          program = "${file}",
+          cwd = "${workspaceFolder}",
+          pathBashdb = mason_path .. "/packages/bash-debug-adapter/extension/bashdb_dir/bashdb",
+          pathBashdbLib = mason_path .. "/packages/bash-debug-adapter/extension/bashdb_dir",
+          pathBash = "bash",
+          pathCat = "cat",
+          pathMkfifo = "mkfifo",
+          pathPkill = "pkill",
+          env = {},
+          args = {},
+        },
+      }
 
       -- Keybindings
       vim.keymap.set("n", "<F5>", function() dap.continue() end, { desc = "Debug: Start/Continue" })

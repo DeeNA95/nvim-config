@@ -12,7 +12,7 @@ require("config.autocmds").setup()
 
 -- Basic settings (some duplicated in options.lua but important to have here)
 vim.opt.number = true
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 vim.opt.mouse = "a"
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
