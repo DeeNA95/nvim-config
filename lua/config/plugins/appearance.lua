@@ -1,40 +1,26 @@
--- In your lua/config/plugins/appearance.lua
 return {
-  -- Tokyo Night theme - elegant dark theme with multiple variants
   {
-    "folke/tokyonight.nvim",
+    "rebelot/kanagawa.nvim",
+    name = "kanagawa",
     lazy = false,
     priority = 1000,
     config = function()
-      require("tokyonight").setup({
-        style = "night", -- Choose: night, storm, day, moon
-        transparent = true,
-        terminal_colors = true,
-        styles = {
-          comments = { italic = true },
-          keywords = { italic = true },
-          functions = {},
-          variables = {},
+      require("kanagawa").setup({
+        compile = false,
+        undercurl = true,
+        commentStyle = { italic = true },
+        keywordStyle = { italic = true },
+        statementStyle = { bold = true },
+        transparent = false,
+        terminalColors = true,
+        theme = "wave",
+        background = {
+            dark = "wave",
+            light = "lotus"
         },
       })
-      vim.cmd("colorscheme tokyonight")
+      vim.cmd("colorscheme kanagawa")
     end,
-  },
-
-  -- Other beautiful themes to try (uncomment to use)
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    lazy = true, -- Keep this lazy-loaded
-  },
-  {
-    "EdenEast/nightfox.nvim",
-    lazy = true,
-  },
-  {
-    "rose-pine/neovim",
-    name = "rose-pine",
-    lazy = true,
   },
 }
 

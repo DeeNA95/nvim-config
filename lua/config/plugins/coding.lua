@@ -35,9 +35,7 @@ return {
     "kylechui/nvim-surround",
     version = "*",
     event = "VeryLazy",
-    config = function()
-      require("nvim-surround").setup({})
-    end,
+    opts = {}, -- Replaces config = function() require("nvim-surround").setup({}) end
   },
 
   -- Better comments
@@ -71,10 +69,7 @@ return {
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    init = function()
-      vim.o.timeout = true
-      -- timeoutlen set in config/options.lua
-    end,
+    opts_extend = { "spec" }, -- Allows extending specs from other files cleanly
     opts = {
       win = {
         border = "rounded",
@@ -124,6 +119,7 @@ return {
   -- TODO/FIXME/HACK highlights
   {
     "folke/todo-comments.nvim",
+    cmd = { "TodoTrouble", "TodoTelescope" },
     event = { "BufReadPost", "BufNewFile" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
@@ -131,7 +127,7 @@ return {
       { "]t", function() require("todo-comments").jump_next() end, desc = "Next TODO" },
       { "[t", function() require("todo-comments").jump_prev() end, desc = "Prev TODO" },
       { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
-      { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "TODOs (Trouble)" },
+      { "<leader>xt", "<cmd>TodoTrouble<cr>", desc = "TODOs (Trouble)" },
     },
   },
 

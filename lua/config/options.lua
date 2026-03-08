@@ -42,9 +42,9 @@ opt.listchars = {
 vim.api.nvim_create_autocmd("ColorScheme", {
   pattern = "*",
   callback = function()
-    -- Make background transparent
-    vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", ctermbg = "NONE" })
+    -- -- Make background transparent
+    -- vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
+    -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", ctermbg = "NONE" })
   end,
 })
 

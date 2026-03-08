@@ -1,5 +1,6 @@
 return {
   "nvim-telescope/telescope.nvim", -- Main plugin
+  branch = "0.1.x",
   dependencies = {
     "nvim-lua/plenary.nvim", -- Required dependency for Telescope
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" }, -- Necessary for fzf-native
@@ -32,7 +33,7 @@ return {
             preview_width = 0.6,
           },
         },
-        search_dirs = { "~/projects", "~/notes" }, -- Adjust as needed
+        --search_dirs = { "~/projects", "~/notes" }, -- Adjust as needed
       },
       pickers = {
         -- Custom configuration for builtin pickers

@@ -113,6 +113,7 @@ return {
     cmd = "ToggleTerm",
     keys = {
       { "<C-\\>", "<cmd>ToggleTerm<cr>", desc = "Toggle terminal" },
+      { "<leader>tt", "<cmd>ToggleTerm<cr>", desc = "Toggle terminal" },
     },
     opts = {
       size = 20,

@@ -2,42 +2,56 @@ return {
   {
     "mfussenegger/nvim-dap",
     dependencies = {
-      "rcarriga/nvim-dap-ui",
-      "mfussenegger/nvim-dap-python",
-      "leoluz/nvim-dap-go",
-      "nvim-neotest/nvim-nio",
-      "theHamsta/nvim-dap-virtual-text",
+      {
+        "rcarriga/nvim-dap-ui",
+        dependencies = { "nvim-neotest/nvim-nio" },
+        config = function()
+          local dap = require("dap")
+          local dapui = require("dapui")
+          dapui.setup()
+
+          -- Automatically open/close DAP UI
+          dap.listeners.after.event_initialized["dapui_config"] = function()
+            dapui.open()
+          end
+          dap.listeners.before.event_terminated["dapui_config"] = function()
+            dapui.close()
+          end
+          dap.listeners.before.event_exited["dapui_config"] = function()
+            dapui.close()
+          end
+        end,
+      },
+      {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = { commented = true }, -- Show virtual text as comments
+      },
+      {
+        "mfussenegger/nvim-dap-python",
+        config = function()
+          require("dap-python").setup("/usr/bin/python3") -- Path to python
+          require("dap-python").test_runner = "pytest"
+        end,
+      },
+      {
+        "leoluz/nvim-dap-go",
+        config = true, -- Automatically calls setup()
+      },
+    },
+    keys = {
+      { "<F5>", function() require("dap").continue() end, desc = "Debug: Start/Continue" },
+      { "<F10>", function() require("dap").step_over() end, desc = "Debug: Step Over" },
+      { "<F11>", function() require("dap").step_into() end, desc = "Debug: Step Into" },
+      { "<F12>", function() require("dap").step_out() end, desc = "Debug: Step Out" },
+      { "<leader>b", function() require("dap").toggle_breakpoint() end, desc = "Debug: Toggle Breakpoint" },
+      { "<leader>B", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, desc = "Debug: Set Breakpoint Condition" },
+      { "<leader>dr", function() require("dap").repl.open() end, desc = "Debug: Open REPL" },
+      { "<leader>du", function() require("dapui").toggle() end, desc = "Debug: Toggle UI" },
     },
     config = function()
       local dap = require("dap")
-      local dapui = require("dapui")
-
-      require("nvim-dap-virtual-text").setup({
-        commented = true, -- Show virtual text as comments
-      })
-
-      dapui.setup()
-
-      -- Automatically open/close DAP UI
-      dap.listeners.after.event_initialized["dapui_config"] = function()
-        dapui.open()
-      end
-      dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close()
-      end
-
-      -- Python configuration
-      require("dap-python").setup("/usr/bin/python3") -- Path to python
-      require("dap-python").test_runner = "pytest"
-
-      -- Go configuration (via nvim-dap-go + delve)
-      require("dap-go").setup()
 
       -- C/C++/CUDA configuration (via codelldb)
-      -- Install with :MasonInstall codelldb
       local mason_path = vim.fn.stdpath("data") .. "/mason"
       local codelldb_path = mason_path .. "/bin/codelldb"
 
@@ -99,18 +113,6 @@ return {
           args = {},
         },
       }
-
-      -- Keybindings
-      vim.keymap.set("n", "<F5>", function() dap.continue() end, { desc = "Debug: Start/Continue" })
-      vim.keymap.set("n", "<F10>", function() dap.step_over() end, { desc = "Debug: Step Over" })
-      vim.keymap.set("n", "<F11>", function() dap.step_into() end, { desc = "Debug: Step Into" })
-      vim.keymap.set("n", "<F12>", function() dap.step_out() end, { desc = "Debug: Step Out" })
-      vim.keymap.set("n", "<leader>b", function() dap.toggle_breakpoint() end, { desc = "Debug: Toggle Breakpoint" })
-      vim.keymap.set("n", "<leader>B", function()
-        dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
-      end, { desc = "Debug: Set Breakpoint Condition" })
-      vim.keymap.set("n", "<leader>dr", function() dap.repl.open() end, { desc = "Debug: Open REPL" })
-      vim.keymap.set("n", "<leader>du", function() dapui.toggle() end, { desc = "Debug: Toggle UI" })
     end,
   },
 }

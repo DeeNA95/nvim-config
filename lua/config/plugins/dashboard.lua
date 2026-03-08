@@ -1,10 +1,10 @@
+
 -- Dashboard with alpha-nvim
 return {
   "goolord/alpha-nvim",
   event = "VimEnter",
   dependencies = { "nvim-tree/nvim-web-devicons" },
-  config = function()
-    local alpha = require("alpha")
+  opts = function()
     local dashboard = require("alpha.themes.dashboard")
 
     -- Master Roshi's Turtle Hermit School header
@@ -45,17 +45,18 @@ return {
     dashboard.section.buttons.opts.hl = "AlphaButtons"
     dashboard.section.footer.opts.hl = "AlphaFooter"
 
-    -- Highlight groups
+    return dashboard
+  end,
+  config = function(_, dashboard)
+    -- Highlight groups matching Kanagawa theme
     vim.api.nvim_create_autocmd("User", {
       pattern = "AlphaReady",
       callback = function()
-        vim.api.nvim_set_hl(0, "AlphaHeader", { fg = "#f7768e", bold = true })
-        vim.api.nvim_set_hl(0, "AlphaButtons", { fg = "#7aa2f7" })
-        vim.api.nvim_set_hl(0, "AlphaFooter", { fg = "#565f89", italic = true })
+        vim.api.nvim_set_hl(0, "AlphaHeader", { fg = "#E46876", bold = true })  -- Kanagawa red
+        vim.api.nvim_set_hl(0, "AlphaButtons", { fg = "#7E9CD8" })              -- Kanagawa blue
+        vim.api.nvim_set_hl(0, "AlphaFooter", { fg = "#717C7C", italic = true }) -- Kanagawa gray
       end,
     })
-
-    alpha.setup(dashboard.opts)
 
     -- Disable folding on alpha buffer
     vim.api.nvim_create_autocmd("FileType", {
@@ -64,5 +65,7 @@ return {
         vim.opt_local.foldenable = false
       end,
     })
+
+    require("alpha").setup(dashboard.opts)
   end,
 }

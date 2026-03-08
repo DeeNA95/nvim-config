@@ -6,261 +6,155 @@ return {
     dependencies = {
       {
         "williamboman/mason.nvim",
-        config = function()
-          require("mason").setup({
-            ui = {
-              border = "rounded",
-              icons = {
-                package_installed = "✓",
-                package_pending = "➜",
-                package_uninstalled = "✗"
-              }
-            }
-          })
-        end
+        opts = {
+          ui = {
+            border = "rounded",
+            icons = { package_installed = "✓", package_pending = "➜", package_uninstalled = "✗" },
+          },
+        },
       },
-      {
-        "williamboman/mason-lspconfig.nvim",
-        config = function()
-          require("mason-lspconfig").setup({
-            ensure_installed = {
-              "pyright",  -- Python
-              "clangd",   -- C/C++
-              "gopls",    -- Go
-              "neocmake",  -- CMake
-              "dockerls",  -- Dockerfile
-              "docker_compose_language_service",  -- Docker Compose
-              "bashls",   -- Shell/Bash
-              "lua_ls",   -- Lua
-              "yamlls",   -- YAML
-              "jsonls",   -- JSON
-              "taplo",    -- TOML
-            },
-            automatic_installation = true,
-            -- Noop handler: prevents auto-starting servers
-            -- (we configure them manually via vim.lsp.config/enable below)
-            handlers = {
-              function(server_name) end,
-            },
-          })
-        end
-      },
+      "williamboman/mason-lspconfig.nvim",
       {
         "WhoIsSethDaniel/mason-tool-installer.nvim",
-        config = function()
-          require("mason-tool-installer").setup({
-            ensure_installed = {
-              -- Formatters
-              "black",
-              "isort",
-              "clang-format",
-              "goimports",
-              "golines",
-              "cmakelang",      -- cmake-format + cmake-lint
-              "shfmt",          -- Shell
-              "stylua",         -- Lua
-              "yamlfmt",        -- YAML
-              "prettier",       -- JSON, Markdown, YAML fallback
-
-              -- Linters
-              "flake8",
-              "golangci-lint",
-              "checkmake",
-              "hadolint",
-              "markdownlint",
-              "shellcheck",     -- Shell/Bash
-
-              -- Debuggers
-              "codelldb",       -- C/C++/CUDA
-              "delve",          -- Go
-              "debugpy",        -- Python
-              "bash-debug-adapter", -- Bash
-            },
-            auto_update = false,
-            run_on_start = true,
-          })
-        end
+        opts = {
+          ensure_installed = {
+            "black", "isort", "clang-format", "goimports", "golines", "cmakelang", "shfmt", "stylua", "yamlfmt", "prettier",
+            "flake8", "golangci-lint", "checkmake", "hadolint", "markdownlint", "shellcheck",
+            "codelldb", "delve", "debugpy", "bash-debug-adapter",
+          },
+          auto_update = false,
+          run_on_start = true,
+        },
       },
       {
         "j-hui/fidget.nvim",
         tag = "legacy",
-        opts = {
-          window = {
-            blend = 0,
-          },
-        },
+        opts = { window = { blend = 0 } },
       },
       "ray-x/lsp_signature.nvim",
-      "b0o/schemastore.nvim",  -- JSON/YAML schemas
+      "b0o/schemastore.nvim",
     },
     config = function()
       -- Configure diagnostics
       vim.diagnostic.config({
-        virtual_text = {
-          prefix = '■',
-        },
+        virtual_text = { prefix = "■" },
         signs = true,
         underline = true,
         update_in_insert = false,
         severity_sort = true,
-        float = {
-          border = "rounded",
-          source = "always",
-        },
+        float = { border = "rounded", source = "always" },
       })
 
       -- Setup LSP signature help
       require("lsp_signature").setup({
         bind = true,
-        handler_opts = {
-          border = "rounded",
-        },
+        handler_opts = { border = "rounded" },
         floating_window = true,
         hint_enable = false,
         hint_prefix = "🔍 ",
       })
 
-      -- Start LSP servers
-      local on_attach = require("config.plugins.lsp.handlers").on_attach
-      local capabilities = require("config.plugins.lsp.handlers").capabilities()
+      local handlers = require("config.plugins.lsp.handlers")
+      local default_on_attach = handlers.on_attach
+      local default_capabilities = handlers.capabilities()
 
-      -- Python setup
-      vim.lsp.config('pyright', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          python = {
-            analysis = {
-              autoSearchPaths = true,
-              diagnosticMode = "workspace",
-              useLibraryCodeForTypes = true,
-              typeCheckingMode = "basic",
+      -- Define all LSP servers and their specific configurations
+      local servers = {
+        basedpyright = {
+          settings = {
+            basedpyright = {
+              analysis = {
+                autoSearchPaths = true,
+                diagnosticMode = "workspace",
+                useLibraryCodeForTypes = true,
+                typeCheckingMode = "standard",
+              },
             },
           },
         },
-      })
-      vim.lsp.enable('pyright')
-
-      -- C/C++ setup
-      vim.lsp.config('clangd', {
-        on_attach = function(client, bufnr)
-          client.server_capabilities.documentFormattingProvider = false
-          on_attach(client, bufnr)
-        end,
-        capabilities = capabilities,
-        cmd = {
-          "clangd",
-          "--background-index",
-          "--suggest-missing-includes",
-          "--clang-tidy",
-          "--header-insertion=iwyu",
+        clangd = {
+          -- Custom on_attach to disable formatting in favor of clang-format
+          on_attach = function(client, bufnr)
+            client.server_capabilities.documentFormattingProvider = false
+            default_on_attach(client, bufnr)
+          end,
+          cmd = {
+            "clangd",
+            "--background-index",
+            "--suggest-missing-includes",
+            "--clang-tidy",
+            "--header-insertion=iwyu",
+          },
         },
-      })
-      vim.lsp.enable('clangd')
-
-      -- Go setup
-      vim.lsp.config('gopls', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          gopls = {
-            analyses = {
-              unusedparams = true,
-              shadow = true,
+        gopls = {
+          settings = {
+            gopls = {
+              analyses = { unusedparams = true, shadow = true },
+              staticcheck = true,
+              gofumpt = true,
+              usePlaceholders = true,
+              completeUnimported = true,
+              matcher = "fuzzy",
+              experimentalWorkspaceModule = true,
             },
-            staticcheck = true,
-            gofumpt = true,
-            usePlaceholders = true,
-            completeUnimported = true,
-            matcher = "fuzzy",
-            experimentalWorkspaceModule = true,
           },
         },
-      })
-      vim.lsp.enable('gopls')
-
-      -- CMake setup
-      vim.lsp.config('neocmake', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-      vim.lsp.enable('neocmake')
-
-      -- Dockerfile setup
-      vim.lsp.config('dockerls', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-      vim.lsp.enable('dockerls')
-
-      -- Docker Compose setup
-      vim.lsp.config('docker_compose_language_service', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-      vim.lsp.enable('docker_compose_language_service')
-
-      -- Bash/Shell setup
-      vim.lsp.config('bashls', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      })
-      vim.lsp.enable('bashls')
-
-      -- Lua setup (Neovim-aware)
-      vim.lsp.config('lua_ls', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          Lua = {
-            runtime = { version = "LuaJIT" },
-            diagnostics = { globals = { "vim" } },
-            workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
-              checkThirdParty = false,
+        lua_ls = {
+          settings = {
+            Lua = {
+              runtime = { version = "LuaJIT" },
+              diagnostics = { globals = { "vim" } },
+              workspace = {
+                library = vim.api.nvim_get_runtime_file("", true),
+                checkThirdParty = false,
+              },
+              telemetry = { enable = false },
             },
-            telemetry = { enable = false },
           },
         },
-      })
-      vim.lsp.enable('lua_ls')
-
-      -- YAML setup
-      vim.lsp.config('yamlls', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          yaml = {
-            schemas = {
-              ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
-              ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "docker-compose*.yml",
+        yamlls = {
+          settings = {
+            yaml = {
+              schemas = {
+                ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+                ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "docker-compose*.yml",
+              },
+              validate = true,
+              completion = true,
             },
-            validate = true,
-            completion = true,
           },
         },
-      })
-      vim.lsp.enable('yamlls')
-
-      -- JSON setup
-      vim.lsp.config('jsonls', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          json = {
-            schemas = require("schemastore") and require("schemastore").json.schemas() or {},
-            validate = { enable = true },
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
+            },
           },
         },
-      })
-      vim.lsp.enable('jsonls')
+        -- Servers with no specific config
+        neocmake = {},
+        dockerls = {},
+        docker_compose_language_service = {},
+        bashls = {},
+        taplo = {},
+      }
 
-      -- TOML setup
-      vim.lsp.config('taplo', {
-        on_attach = on_attach,
-        capabilities = capabilities,
+      -- Setup mason-lspconfig with automatic handler mapping
+      require("mason-lspconfig").setup({
+        ensure_installed = vim.tbl_keys(servers),
+        handlers = {
+          -- Default handler maps the configuration from `servers` above using `lspconfig`
+          function(server_name)
+            local server_opts = servers[server_name] or {}
+            -- Inject default configuration on top of any custom settings
+            server_opts.on_attach = server_opts.on_attach or default_on_attach
+            server_opts.capabilities = vim.tbl_deep_extend("force", default_capabilities, server_opts.capabilities or {})
+
+            require("lspconfig")[server_name].setup(server_opts)
+          end,
+        },
       })
-      vim.lsp.enable('taplo')
     end,
   },
 }

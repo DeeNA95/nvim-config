@@ -64,8 +64,8 @@ M.capabilities = function()
     }
   }
 
-  -- Add nvim-cmp capability support
-  return require("cmp_nvim_lsp").default_capabilities(capabilities)
+  -- Add blink.cmp capability support
+  return require("blink.cmp").get_lsp_capabilities(capabilities)
 end
 
 return M
