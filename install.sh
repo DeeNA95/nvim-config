@@ -28,10 +28,22 @@ check_nvim_version() {
 install_nvim() {
     OS="$(uname -s)"
     ARCH="$(uname -m)"
-    DOWNLOAD_URL=""
 
     echo "📦 Installing Neovim $NVIM_VERSION for $OS ($ARCH)..."
 
+    if [ "$OS" = "Linux" ]; then
+        if [ "$ARCH" = "x86_64" ]; then
+            echo "⬇️ Downloading Neovim AppImage..."
+            curl -LO "https://github.com/neovim/neovim/releases/download/v$NVIM_VERSION/nvim-linux-x86_64.appimage"
+            chmod +x nvim-linux-x86_64.appimage
+            mv nvim-linux-x86_64.appimage "$LOCAL_BIN/nvim"
+            echo "✅ Neovim $NVIM_VERSION AppImage installed to $LOCAL_BIN/nvim"
+            return 0
+        fi
+    fi
+
+    # Fallback/Default for macOS or other Linux architectures
+    DOWNLOAD_URL=""
     case "$OS" in
         Darwin)
             if [ "$ARCH" = "arm64" ]; then
@@ -41,16 +53,14 @@ install_nvim() {
             fi
             ;;
         Linux)
-            if [ "$ARCH" = "x86_64" ]; then
-                DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/v$NVIM_VERSION/nvim-linux-x86_64.tar.gz"
-            elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+            if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
                 DOWNLOAD_URL="https://github.com/neovim/neovim/releases/download/v$NVIM_VERSION/nvim-linux-arm64.tar.gz"
             fi
             ;;
     esac
 
     if [ -z "$DOWNLOAD_URL" ]; then
-        echo "❌ Error: Unsupported OS/Architecture: $OS/$ARCH"
+        echo "❌ Error: Unsupported OS/Architecture for tarball fallback: $OS/$ARCH"
         exit 1
     fi
 
@@ -64,19 +74,8 @@ install_nvim() {
 
     echo "📂 Extracting Neovim..."
     tar -xzf "$TEMP_DIR"/*.tar.gz -C "$TEMP_DIR"
-
-    # Neovim tarball structure: nvim-<os>-<arch>/bin/nvim etc.
     EXTRACTED_DIR=$(find "$TEMP_DIR" -maxdepth 1 -type d -name "nvim-*" | head -n 1)
-
-    if [ -z "$EXTRACTED_DIR" ]; then
-        echo "❌ Error: Could not find extracted Neovim directory."
-        rm -rf "$TEMP_DIR"
-        exit 1
-    fi
-
-    echo "🚚 Installing to $LOCAL_DIR..."
     cp -r "$EXTRACTED_DIR"/* "$LOCAL_DIR/"
-
     rm -rf "$TEMP_DIR"
     echo "✅ Neovim $NVIM_VERSION installed successfully."
 }
@@ -146,10 +145,13 @@ echo "git Cloning repository..."
 git clone https://github.com/DeeNA95/nvim-config.git "$CONFIG_DIR"
 
 # 5. Add ~/.local/bin to PATH for the current session if not present
-if [[ ":$PATH:" != *":$LOCAL_BIN:"* ]]; then
-    export PATH="$LOCAL_BIN:$PATH"
-    echo "⚠️ Added $LOCAL_BIN to current session PATH."
-fi
+case ":$PATH:" in
+    *":$LOCAL_BIN:"*) ;;
+    *)
+        export PATH="$LOCAL_BIN:$PATH"
+        echo "⚠️ Added $LOCAL_BIN to current session PATH."
+        ;;
+esac
 
 # 6. Install plugins using Lazy.nvim
 echo "🔌 Installing plugins..."
