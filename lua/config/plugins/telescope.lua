@@ -1,6 +1,6 @@
 return {
   "nvim-telescope/telescope.nvim", -- Main plugin
-  branch = "0.1.x",
+  branch = "master",
   dependencies = {
     "nvim-lua/plenary.nvim", -- Required dependency for Telescope
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" }, -- Necessary for fzf-native
